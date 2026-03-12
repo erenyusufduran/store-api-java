@@ -6,6 +6,9 @@ import com.eren.storeapi.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.context.ApplicationEventPublisher;
+import com.eren.storeapi.event.OrderCreatedEvent;
+
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -17,17 +20,21 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final InventoryRepository inventoryRepository;
     private final ProductRepository productRepository;
+    private final ApplicationEventPublisher eventPublisher;
+
 
     public OrderService(
             OrderRepository orderRepository,
             OrderItemRepository orderItemRepository,
             InventoryRepository inventoryRepository,
-            ProductRepository productRepository
+            ProductRepository productRepository,
+            ApplicationEventPublisher eventPublisher
     ) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.inventoryRepository = inventoryRepository;
         this.productRepository = productRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -67,6 +74,8 @@ public class OrderService {
 
             orderItemRepository.save(orderItem);
         }
+
+        eventPublisher.publishEvent(new OrderCreatedEvent(order.getId(), storeId, OffsetDateTime.now()));
 
         return order;
     }
