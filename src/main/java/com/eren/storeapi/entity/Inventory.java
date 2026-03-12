@@ -27,6 +27,10 @@ public class Inventory {
     @Column(nullable = false)
     private Integer quantity;
 
+    @Version
+    @Column(nullable = false)
+    private Long version;
+
     public Inventory() {
     }
 
@@ -67,5 +71,13 @@ public class Inventory {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

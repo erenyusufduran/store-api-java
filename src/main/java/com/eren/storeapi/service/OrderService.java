@@ -32,12 +32,17 @@ public class OrderService {
 
     @Transactional
     public Order createOrder(UUID storeId, List<OrderRequestItem> items) {
+        if (items == null || items.isEmpty()) {
+            throw new BadRequestException("order items cannot be empty");
+        }
 
         Order order = new Order(UUID.randomUUID(), OffsetDateTime.now());
-
         orderRepository.save(order);
 
         for (OrderRequestItem item : items) {
+            if (item.quantity() == null || item.quantity() <= 0) {
+                throw new BadRequestException("quantity must be greater than 0");
+            }
 
             Product product = productRepository.findById(item.productId())
                     .orElseThrow(() -> new BadRequestException("product not found"));
@@ -51,7 +56,6 @@ public class OrderService {
             }
 
             inventory.setQuantity(inventory.getQuantity() - item.quantity());
-
             inventoryRepository.save(inventory);
 
             OrderItem orderItem = new OrderItem(

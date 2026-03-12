@@ -20,14 +20,14 @@ public class OrderController {
     }
 
     @PostMapping
-    public UUID createOrder(@Valid @RequestBody CreateOrderRequest request) {
+    public CreateOrderResponse createOrder(@Valid @RequestBody CreateOrderRequest request) {
 
         Order order = orderService.createOrder(
                 request.storeId(),
                 request.items()
         );
 
-        return order.getId();
+        return new CreateOrderResponse(order.getId(), "created");
     }
 
     public record CreateOrderRequest(
@@ -36,5 +36,10 @@ public class OrderController {
 
             @NotNull
             List<OrderService.OrderRequestItem> items
+    ) {}
+
+    public record CreateOrderResponse(
+            UUID id,
+            String status
     ) {}
 }

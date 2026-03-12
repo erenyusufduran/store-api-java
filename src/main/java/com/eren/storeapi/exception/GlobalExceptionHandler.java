@@ -3,6 +3,7 @@ package com.eren.storeapi.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
@@ -34,6 +35,12 @@ public class GlobalExceptionHandler {
                 .orElse("validation error");
 
         return errorResponse(HttpStatus.BAD_REQUEST, message);
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, Object> handleOptimisticLock(ObjectOptimisticLockingFailureException ex) {
+        return errorResponse(HttpStatus.CONFLICT, "stock was changed by another request, please retry");
     }
 
     private Map<String, Object> errorResponse(HttpStatus status, String message) {
